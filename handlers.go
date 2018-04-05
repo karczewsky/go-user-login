@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -15,6 +16,34 @@ const internalPage = `
     <button type="submit">Logout</button>
 </form>
 `
+
+type user struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
+
+func apiHandler(response http.ResponseWriter, request *http.Request) {
+	group := &user{
+		ID:   1,
+		Name: "Adam",
+		Role: "admin",
+	}
+
+	res1B, err := json.Marshal(group)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	userName := getUserName(request)
+	if userName != "" {
+		fmt.Fprintf(response, string(res1B))
+	} else {
+		http.Redirect(response, request, "/", 302)
+	}
+}
 
 func internalPageHandler(response http.ResponseWriter, request *http.Request) {
 	userName := getUserName(request)
